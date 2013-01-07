@@ -22,5 +22,4 @@ run_list(*%w[
   postgresql::client
   postgresql::server
   postgresql::contrib
-  postgresql::postgis
 ])
