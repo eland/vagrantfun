@@ -1,0 +1,3 @@
+[submodule "cookbooks/chef-solo-search"]
+	path = cookbooks/chef-solo-search
+	url = https://github.com/edelight/chef-solo-search.git

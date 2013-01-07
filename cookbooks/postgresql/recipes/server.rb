@@ -5,14 +5,12 @@
 
 require_recipe "postgresql"
 
-pg_version = node["postgresql"]["version"]
-
 # install the package
-package "postgresql-#{pg_version}"
+package "postgresql-#{node['postgresql']['version']}"
 
 
 # environment
-template "/etc/postgresql/#{pg_version}/main/environment" do
+template "/etc/postgresql/#{node['postgresql']['version']}/main/environment" do
   source "environment.erb"
   owner  "postgres"
   group  "postgres"
@@ -21,7 +19,7 @@ template "/etc/postgresql/#{pg_version}/main/environment" do
 end
 
 # pg_ctl
-template "/etc/postgresql/#{pg_version}/main/pg_ctl.conf" do
+template "/etc/postgresql/#{node['postgresql']['version']}/main/pg_ctl.conf" do
   source "pg_ctl.conf.erb"
   owner  "postgres"
   group  "postgres"
@@ -48,7 +46,7 @@ template node["postgresql"]["ident_file"] do
 end
 
 # postgresql
-template "/etc/postgresql/#{pg_version}/main/postgresql.conf" do
+template "/etc/postgresql/#{node['postgresql']['version']}/main/postgresql.conf" do
   source "postgresql.conf.erb"
   owner  "postgres"
   group  "postgres"
@@ -57,7 +55,7 @@ template "/etc/postgresql/#{pg_version}/main/postgresql.conf" do
 end
 
 # start
-template "/etc/postgresql/#{pg_version}/main/start.conf" do
+template "/etc/postgresql/#{node['postgresql']['version']}/main/start.conf" do
   source "start.conf.erb"
   owner  "postgres"
   group  "postgres"
