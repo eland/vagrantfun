@@ -1,3 +1,5 @@
 Gemfile.lock
 .vagrant
 data_bags/users
+.DS_Store
+*.swp
