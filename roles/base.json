@@ -8,10 +8,11 @@
   },
   "chef_type": "role",
   "run_list": [
-	"vim",
-  	"git",
-        "zsh",
-	"oh-my-zsh"
+    "vim",
+    "git",
+    "zsh",
+    "oh-my-zsh",
+    "recipe[ruby_build]"
   ],
   "env_run_lists": {
   }

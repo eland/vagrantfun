@@ -31,6 +31,13 @@ Vagrant::Config.run do |config|
   # computers to access the VM, whereas host only networking does not.
   # config.vm.forward_port 80, 8080
 
+  ###
+  ### Port forwarding (APIs may need different ports)
+  ###
+
+  #for Rails
+  config.vm.forward_port 3000, 3000
+
   # Share an additional folder to the guest VM. The first argument is
   # an identifier, the second is the path on the guest to mount the
   # folder, and the third is the path on the host to the actual folder.
@@ -66,15 +73,60 @@ Vagrant::Config.run do |config|
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = "./cookbooks"
     chef.roles_path = "./roles"
-    chef.data_bags_path = "./data_bags"
-    chef.add_recipe "users::sysadmins"
+    # chef.data_bags_path = "./data_bags"
+    # chef.add_recipe "users::sysadmins"
     chef.add_recipe "vim"
-    #chef.add_recipe ""
+    chef.add_recipe "vagrantfun::update"
+
+    ###
+    ### Choose your database:
+    ###
     chef.add_role "postgres"
+
+
+    ###
+    ### MRI Ruby
+    ###
+    chef.json           = {
+      'rbenv' => {
+        'global' => '1.9.3-p392',
+        'rubies' => [ '1.9.3-p392' ],
+        'gems'   => {
+          '1.9.3-p392' => [
+            { 'name'   => 'bundler' }
+          ]
+        }
+      }
+    }
+
+    ###
+    ### JRuby
+    ###
+    # chef.json           = {
+    #   'rbenv' => {
+    #     'global' => 'jruby-1.7.2',
+    #     'rubies' => [ 'jruby-1.7.2' ],
+    #     'gems'   => {
+    #       'jruby-1.7.2' => [
+    #         { 'name'   => 'bundler' }
+    #       ]
+    #     }
+    #   }
+    # }
+
+    ###
+    ### If you're using any ruby (jruby, etc), keep the 'ruby' role in.
+    ### (installs rbenv and the ruby specified above in the chef.json)
+    chef.add_role 'ruby'
+    
+
+    ###
+    ### Application Startup scripts
+    ###
+    chef.add_recipe "vagrantfun::rails"
  
-  # You may also specify custom JSON attributes:
-    #chef.json = {  }
   end
+
 
   # Enable provisioning with chef server, specifying the chef server URL,
   # and the path to the validation key (relative to this Vagrantfile).

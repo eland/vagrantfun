@@ -10,3 +10,9 @@
 [submodule "cookbooks/oh-my-zsh"]
 	path = cookbooks/oh-my-zsh
 	url = https://github.com/hw-cookbooks/oh-my-zsh.git
+[submodule "cookbooks/rbenv"]
+	path = cookbooks/rbenv
+	url = https://github.com/fnichol/chef-rbenv.git
+[submodule "cookbooks/ruby_build"]
+	path = cookbooks/ruby_build
+	url = https://github.com/fnichol/chef-ruby_build.git
