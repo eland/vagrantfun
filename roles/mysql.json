@@ -1,0 +1,20 @@
+{
+  "name": "mysql",
+  "description": "Install mysql",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+
+  "default_attributes": {
+    "mysql": {
+      "server_root_password": "redLemurs",
+      "server_repl_password": "redLemurs",
+      "server_debian_password": "redLemurs"
+    }
+  },
+
+  "run_list": [
+    "recipe[mysql::server]",
+    "recipe[mysql::ruby]",
+    "recipe[vagrantfun::mysql_dbs]"
+  ]
+}

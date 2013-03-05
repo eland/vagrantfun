@@ -75,55 +75,36 @@ Vagrant::Config.run do |config|
     chef.roles_path = "./roles"
     # chef.data_bags_path = "./data_bags"
     # chef.add_recipe "users::sysadmins"
-    chef.add_recipe "vim"
+    # chef.add_recipe "vim"
+
+    #for updated package lists
     chef.add_recipe "vagrantfun::update"
 
     ###
     ### Choose your database:
     ###
-    chef.add_role "postgres"
 
+    # postgres
+    # chef.add_role "postgres"
 
-    ###
-    ### MRI Ruby
-    ###
-    chef.json           = {
-      'rbenv' => {
-        'global' => '1.9.3-p392',
-        'rubies' => [ '1.9.3-p392' ],
-        'gems'   => {
-          '1.9.3-p392' => [
-            { 'name'   => 'bundler' }
-          ]
-        }
-      }
-    }
+    #mysql
+    chef.add_role "mysql"
 
     ###
-    ### JRuby
+    ### Choose your Ruby:
     ###
-    # chef.json           = {
-    #   'rbenv' => {
-    #     'global' => 'jruby-1.7.2',
-    #     'rubies' => [ 'jruby-1.7.2' ],
-    #     'gems'   => {
-    #       'jruby-1.7.2' => [
-    #         { 'name'   => 'bundler' }
-    #       ]
-    #     }
-    #   }
-    # }
 
-    ###
-    ### If you're using any ruby (jruby, etc), keep the 'ruby' role in.
-    ### (installs rbenv and the ruby specified above in the chef.json)
-    chef.add_role 'ruby'
-    
+    # MRI
+    # chef.add_role "mri_ruby"
+
+    # JRuby
+    chef.add_role "jruby"
 
     ###
     ### Application Startup scripts
     ###
-    chef.add_recipe "vagrantfun::rails"
+
+    # chef.add_recipe "vagrantfun::rails"
  
   end
 

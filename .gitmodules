@@ -16,3 +16,12 @@
 [submodule "cookbooks/ruby_build"]
 	path = cookbooks/ruby_build
 	url = https://github.com/fnichol/chef-ruby_build.git
+[submodule "cookbooks/mysql"]
+	path = cookbooks/mysql
+	url = https://github.com/opscode-cookbooks/mysql.git
+[submodule "cookbooks/openssl"]
+	path = cookbooks/openssl
+	url = https://github.com/opscode-cookbooks/openssl
+[submodule "cookbooks/java"]
+	path = cookbooks/java
+	url = https://github.com/opscode-cookbooks/java.git

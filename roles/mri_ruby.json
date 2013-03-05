@@ -1,0 +1,27 @@
+{
+  "name": "mri_ruby",
+  "description": "Install mri ruby and rbenv",
+  "chef_type": "role",
+  "json_class": "Chef::Role",
+
+  
+  "default_attributes": 
+  {
+    "rbenv": 
+    {
+      "global": "1.9.3-p392",
+      "rubies": ["1.9.3-p392"],
+      "gems":
+      {
+        "1.9.3-p392": [
+            { "name": "bundler" }
+          ]
+      }
+    }
+  },
+
+  "run_list": [
+    "recipe[ruby_build]",
+    "recipe[rbenv::system]"
+  ]
+}
