@@ -34,5 +34,5 @@ end
 mysql_database_user 'test' do
   connection mysql_connection_info
   password 'password'
-  action :create
+  action :grant
 end

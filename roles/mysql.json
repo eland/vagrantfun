@@ -6,6 +6,7 @@
 
   "default_attributes": {
     "mysql": {
+      "bind_address": "3306",
       "server_root_password": "redLemurs",
       "server_repl_password": "redLemurs",
       "server_debian_password": "redLemurs"
