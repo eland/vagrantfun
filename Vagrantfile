@@ -70,36 +70,123 @@ Vagrant::Config.run do |config|
   # path, and data_bags path (all relative to this Vagrantfile), and adding 
   # some recipes and/or roles.
   #
+
+  config.vm.customize ["modifyvm", :id, "--memory", 1536]
+
+  config.vm.provision :chef_solo do |prechef|
+    #If using a recipe_url, include it here too
+    prechef.add_recipe "vagrantfun::update"
+  end
+
   config.vm.provision :chef_solo do |chef|
+    # chef.roles_path = "./roles"
     chef.cookbooks_path = "./cookbooks"
-    chef.roles_path = "./roles"
     # chef.data_bags_path = "./data_bags"
     # chef.add_recipe "users::sysadmins"
     # chef.add_recipe "vim"
+    # chef.recipe_url = 'http://example.com/file.tar.gz' # put a tarball of the cookbooks here
 
     #for updated package lists
-    chef.add_recipe "vagrantfun::update"
+    # chef.add_recipe "vagrantfun::update"
 
-    ###
-    ### Choose your database:
-    ###
+    chef.json = { 
+     #:omnibus_updater => {
+     #  :version => '11.4.0'
+     #},
 
-    # postgres
-    # chef.add_role "postgres"
+      'java' => {
+        'jdk_version' => 7,
+        'install_flavor' => 'oracle',
+        'oracle' => {
+          "accept_oracle_download_terms" => true
+        }
+      },
+      
+      # JRuby
+      'rbenv' => {
+        'global' => 'jruby-1.7.2',
+        'rubies' => [ 'jruby-1.7.2' ],
+        'gems'   => {
+          'jruby-1.7.2' => [
+            { 'name'   => 'bundler' }
+          ]
+        }
+      },
 
-    #mysql
-    chef.add_role "mysql"
+      # # MRI Ruby
+      # 'rbenv' => {
+      #   'global' => '1.9.3-p392',
+      #   'rubies' => [ '1.9.3-p392' ],
+      #   'gems'   => {
+      #     '1.9.3-p392' => [
+      #       { 'name'   => 'bundler' }
+      #     ]
+      #   }
+      # },
+      
+      # 'mysql' => {
+      #   "bind_address" => "3306",
+      #   "server_root_password" => "redLemurs",
+      #   "server_repl_password" => "redLemurs",
+      #   "server_debian_password" => "redLemurs",
+      #   "dbs" => [
+      #     {
+      #       :name => 'test',
+      #       :user => 'test',
+      #       :user_pass => 'password'
+      #     },
+      #     {
+      #       :name => 'development',
+      #       :user => 'test',
+      #       :user_pass => 'password'
+      #     }
+      #   ]
+      # },
 
-    ###
-    ### Choose your Ruby:
-    ###
+      :postgresql => {
+        :version => "9.2",
+        'config' => {
+          'ssl' => false
+        },
+        'password' => {
+          'postgres' => "redLemurs"
+          },
+        "dbs" => [
+          {
+            :name => 'test',
+            :user => 'test',
+            :user_pass => 'password'
+          },
+          {
+            :name => 'development',
+            :user => 'test',
+            :user_pass => 'password'
+          }
+        ]
+        # "run_list" => ["recipe[postgresql::server]"]
+        # :hba_file => "/etc/postgresql/9.2/main/pg_hba.conf"
+      }
+    }
 
-    # MRI
-    # chef.add_role "mri_ruby"
 
-    # JRuby
-    chef.add_role "jruby"
+    chef.add_recipe "vagrantfun::add_repos"
+    # chef.add_recipe "postgresql"
+    # chef.add_recipe "postgresql::client"
+    chef.add_recipe "postgresql::server"
+    # chef.add_recipe "postgresql::contrib"
+    chef.add_recipe "postgresql::ruby"
 
+    # chef.add_recipe "mysql::server"
+    # chef.add_recipe "mysql::ruby"
+    chef.add_recipe "vagrantfun::create_databases"
+
+    # chef.add_recipe "java"
+
+    #for installing any version of ruby
+
+    # chef.add_recipe "ruby_build"
+    # chef.add_recipe "rbenv::system"
+    
     ###
     ### Application Startup scripts
     ###

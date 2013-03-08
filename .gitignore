@@ -3,3 +3,4 @@ Gemfile.lock
 data_bags/users
 .DS_Store
 *.swp
+cookbooks.tar.gz

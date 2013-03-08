@@ -31,3 +31,18 @@
 [submodule "cookbooks/database"]
 	path = cookbooks/database
 	url = https://github.com/opscode-cookbooks/database.git
+[submodule "cookbooks/postgresql"]
+	path = cookbooks/postgresql
+	url = https://github.com/opscode-cookbooks/postgresql.git
+[submodule "cookbooks/apt"]
+	path = cookbooks/apt
+	url = https://github.com/opscode-cookbooks/apt.git
+[submodule "cookbooks/omnibus_updater"]
+	path = cookbooks/omnibus_updater
+	url = https://github.com/hw-cookbooks/omnibus_updater.git
+[submodule "cookbooks/aws"]
+	path = cookbooks/aws
+	url = https://github.com/opscode-cookbooks/aws.git
+[submodule "cookbooks/xfs"]
+	path = cookbooks/xfs
+	url = https://github.com/opscode-cookbooks/xfs.git
