@@ -27,73 +27,63 @@ Vagrant::Config.run do |config|
   # physical device on your network.
   config.vm.network :bridged
 
-  # Forward a port from the guest to the host, which allows for outside
-  # computers to access the VM, whereas host only networking does not.
-  # config.vm.forward_port 80, 8080
-
   ###
   ### Port forwarding (APIs may need different ports)
   ###
 
-  #for Rails
+  #Standard Rails port
   config.vm.forward_port 3000, 3000
 
   # Share an additional folder to the guest VM. The first argument is
   # an identifier, the second is the path on the guest to mount the
   # folder, and the third is the path on the host to the actual folder.
+  # Note that the folder you run 'vagrant up' in is automatically
+  # set to /vagrant in the VM.
   # config.vm.share_folder "v-data", "/vagrant_data", "../data"
 
-  # Enable provisioning with Puppet stand alone.  Puppet manifests
-  # are contained in a directory path relative to this Vagrantfile.
-  # You will need to create the manifests directory and a manifest in
-  # the file base.pp in the manifests_path directory.
-  #
-  # An example Puppet manifest to provision the message of the day:
-  #
-  # # group { "puppet":
-  # #   ensure => "present",
-  # # }
-  # #
-  # # File { owner => 0, group => 0, mode => 0644 }
-  # #
-  # # file { '/etc/motd':
-  # #   content => "Welcome to your Vagrant-built virtual machine!
-  # #               Managed by Puppet.\n"
-  # # }
-  #
-  # config.vm.provision :puppet do |puppet|
-  #   puppet.manifests_path = "manifests"
-  #   puppet.manifest_file  = "base.pp"
-  # end
 
-  # Enable provisioning with chef solo, specifying a cookbooks path, roles
-  # path, and data_bags path (all relative to this Vagrantfile), and adding 
-  # some recipes and/or roles.
-  #
-
+  # Change the memory to what's needed
   config.vm.customize ["modifyvm", :id, "--memory", 1536]
 
+
+  #
+  # Chef Provisioning
+  #
+
   config.vm.provision :chef_solo do |prechef|
-    #If using a recipe_url, include it here too
-    prechef.add_recipe "vagrantfun::update"
+    # If using a recipe_url for the cookbooks, include it here too
+    # prechef.recipe_url = 
+
+    prechef.add_recipe "vagrantfun::update_chef"
+
+    # Can also update with the omnibus_updater cookbook, but that adds
+    # about 20-30 seconds to the process and has trouble
+    # with the pg gem (but manages to successfully install it).
+    # prechef.json = {
+    #   :omnibus_updater => {
+    #     :version => '11.4.0',
+    #     :remove_chef_system_gem => true
+    #   }
+    # }
+    # prechef.add_recipe "omnibus_updater"
+
   end
 
   config.vm.provision :chef_solo do |chef|
     # chef.roles_path = "./roles"
-    chef.cookbooks_path = "./cookbooks"
     # chef.data_bags_path = "./data_bags"
     # chef.add_recipe "users::sysadmins"
     # chef.add_recipe "vim"
+
+    # Choose one of the following:
+    chef.cookbooks_path = "./cookbooks"
     # chef.recipe_url = 'http://example.com/file.tar.gz' # put a tarball of the cookbooks here
 
-    #for updated package lists
-    # chef.add_recipe "vagrantfun::update"
+
 
     chef.json = { 
-     #:omnibus_updater => {
-     #  :version => '11.4.0'
-     #},
 
+      #If you're installing Java
       'java' => {
         'jdk_version' => 7,
         'install_flavor' => 'oracle',
@@ -163,30 +153,33 @@ Vagrant::Config.run do |config|
             :user_pass => 'password'
           }
         ]
-        # "run_list" => ["recipe[postgresql::server]"]
-        # :hba_file => "/etc/postgresql/9.2/main/pg_hba.conf"
       }
     }
 
 
-    chef.add_recipe "vagrantfun::add_repos"
-    # chef.add_recipe "postgresql"
-    # chef.add_recipe "postgresql::client"
-    chef.add_recipe "postgresql::server"
-    # chef.add_recipe "postgresql::contrib"
-    chef.add_recipe "postgresql::ruby"
+    #
+    # RECIPES: without these nothing happens.
+    #
 
-    # chef.add_recipe "mysql::server"
-    # chef.add_recipe "mysql::ruby"
-    chef.add_recipe "vagrantfun::create_databases"
-
-    # chef.add_recipe "java"
-
-    #for installing any version of ruby
-
+    # For installing Ruby (version specified in chef.json above)
     # chef.add_recipe "ruby_build"
     # chef.add_recipe "rbenv::system"
+
+    # For Java
+    # chef.add_recipe "java"
     
+    # For Postgres
+    chef.add_recipe "vagrantfun::add_repos"
+    chef.add_recipe "postgresql::server"
+    chef.add_recipe "postgresql::ruby"
+
+    # For MySQL
+    # chef.add_recipe "mysql::server"
+    # chef.add_recipe "mysql::ruby"
+
+    # For automatiaclly creating databases/users as specified in the 'dbs' hashes in the chef.json above
+    chef.add_recipe "vagrantfun::create_databases"
+
     ###
     ### Application Startup scripts
     ###
@@ -194,28 +187,4 @@ Vagrant::Config.run do |config|
     # chef.add_recipe "vagrantfun::rails"
  
   end
-
-
-  # Enable provisioning with chef server, specifying the chef server URL,
-  # and the path to the validation key (relative to this Vagrantfile).
-  #
-  # The Opscode Platform uses HTTPS. Substitute your organization for
-  # ORGNAME in the URL and validation key.
-  #
-  # If you have your own Chef Server, use the appropriate URL, which may be
-  # HTTP instead of HTTPS depending on your configuration. Also change the
-  # validation key to validation.pem.
-  #
-  # config.vm.provision :chef_client do |chef|
-  #   chef.chef_server_url = "https://api.opscode.com/organizations/ORGNAME"
-  #   chef.validation_key_path = "ORGNAME-validator.pem"
-  # end
-  #
-  # If you're using the Opscode platform, your validator client is
-  # ORGNAME-validator, replacing ORGNAME with your organization name.
-  #
-  # IF you have your own Chef Server, the default validation client name is
-  # chef-validator, unless you changed the configuration.
-  #
-  #   chef.validation_client_name = "ORGNAME-validator"
 end
