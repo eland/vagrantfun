@@ -41,6 +41,10 @@ Vagrant::Config.run do |config|
   # set to /vagrant in the VM.
   # config.vm.share_folder "v-data", "/vagrant_data", "../data"
 
+  # The default VBoxFS gets really slow on unix-based systems.
+  # Comment out the line below if you're running on Windows.
+  config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
+
 
   # Change the memory to what's needed
   config.vm.customize ["modifyvm", :id, "--memory", 1536]
@@ -115,7 +119,7 @@ Vagrant::Config.run do |config|
       # },
       
       # 'mysql' => {
-      #   "bind_address" => "3306",
+      #   "bind_address" => "127.0.0.1",
       #   "server_root_password" => "redLemurs",
       #   "server_repl_password" => "redLemurs",
       #   "server_debian_password" => "redLemurs",

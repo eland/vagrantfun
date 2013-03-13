@@ -21,6 +21,13 @@ unless node['mysql']['dbs'].nil?
       connection mysql_connection_info
       database_name database[:name]
       password database[:user_pass]
+      action :create
+    end
+
+    mysql_database_user database[:user] do
+      connection mysql_connection_info
+      database_name database[:name]
+      password database[:user_pass]
       action :grant
     end
   end
