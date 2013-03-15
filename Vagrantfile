@@ -1,17 +1,18 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu-12.04.1"
+  config.vm.box = "ubuntu-12.04.1-nfs"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
-  config.vm.box_url = "http://dl.dropbox.com/u/4031118/Vagrant/ubuntu-12.04.1-server-i686-virtual.box"
+  # Make sure the box has nfs-common installed.
+  config.vm.box_url = "
 
   # Boot with a GUI so you can see the screen. (Default is headless)
   # config.vm.boot_mode = :gui
@@ -20,19 +21,19 @@ Vagrant::Config.run do |config|
   # via the IP. Host-only networks can talk to the host machine as well as
   # any other machines on the same network, but cannot be accessed (through this
   # network interface) by any external networks.
-  # config.vm.network :hostonly, "192.168.33.10"
+  config.vm.network :private_network, ip: "192.168.33.10"
 
   # Assign this VM to a bridged network, allowing you to connect directly to a
   # network using the host's network device. This makes the VM appear as another
   # physical device on your network.
-  config.vm.network :bridged
+  # config.vm.network :bridged
 
   ###
   ### Port forwarding (APIs may need different ports)
   ###
 
   #Standard Rails port
-  config.vm.forward_port 3000, 3000
+  # config.vm.forward_port 3000, 3000
 
   # Share an additional folder to the guest VM. The first argument is
   # an identifier, the second is the path on the guest to mount the
@@ -41,13 +42,13 @@ Vagrant::Config.run do |config|
   # set to /vagrant in the VM.
   # config.vm.share_folder "v-data", "/vagrant_data", "../data"
 
-  # The default VBoxFS gets really slow on unix-based systems.
-  # Comment out the line below if you're running on Windows.
-  config.vm.share_folder("v-root", "/vagrant", ".", :nfs => true)
-
+  config.vm.synced_folder(".", "/vagrant", :nfs => true)
 
   # Change the memory to what's needed
-  config.vm.customize ["modifyvm", :id, "--memory", 1536]
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", 2048]
+  end
+  # config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "off"] 
 
 
   #
@@ -57,7 +58,6 @@ Vagrant::Config.run do |config|
   config.vm.provision :chef_solo do |prechef|
     # If using a recipe_url for the cookbooks, include it here too
     # prechef.recipe_url = 
-
     prechef.add_recipe "vagrantfun::update_chef"
 
     # Can also update with the omnibus_updater cookbook, but that adds
@@ -80,8 +80,7 @@ Vagrant::Config.run do |config|
     # chef.add_recipe "vim"
 
     # Choose one of the following:
-    chef.cookbooks_path = "./cookbooks"
-    # chef.recipe_url = 'http://example.com/file.tar.gz' # put a tarball of the cookbooks here
+    # chef.recipe_url = 
 
 
 
@@ -118,11 +117,33 @@ Vagrant::Config.run do |config|
       #   }
       # },
       
-      # 'mysql' => {
-      #   "bind_address" => "127.0.0.1",
-      #   "server_root_password" => "redLemurs",
-      #   "server_repl_password" => "redLemurs",
-      #   "server_debian_password" => "redLemurs",
+      'mysql' => {
+        "bind_address" => "127.0.0.1",
+        "server_root_password" => "redLemurs",
+        "server_repl_password" => "redLemurs",
+        "server_debian_password" => "redLemurs",
+        "dbs" => [
+          {
+            :name => 'junto_box_test',
+            :user => 'junto',
+            :user_pass => 'password'
+          },
+          {
+            :name => 'junto_box_dev',
+            :user => 'junto',
+            :user_pass => 'password'
+          }
+        ]
+      },
+
+      # :postgresql => {
+      #   :version => "9.2",
+      #   'config' => {
+      #     'ssl' => false
+      #   },
+      #   'password' => {
+      #     'postgres' => "redLemurs"
+      #     },
       #   "dbs" => [
       #     {
       #       :name => 'test',
@@ -135,29 +156,7 @@ Vagrant::Config.run do |config|
       #       :user_pass => 'password'
       #     }
       #   ]
-      # },
-
-      :postgresql => {
-        :version => "9.2",
-        'config' => {
-          'ssl' => false
-        },
-        'password' => {
-          'postgres' => "redLemurs"
-          },
-        "dbs" => [
-          {
-            :name => 'test',
-            :user => 'test',
-            :user_pass => 'password'
-          },
-          {
-            :name => 'development',
-            :user => 'test',
-            :user_pass => 'password'
-          }
-        ]
-      }
+      # }
     }
 
 
@@ -165,21 +164,21 @@ Vagrant::Config.run do |config|
     # RECIPES: without these nothing happens.
     #
 
-    # For installing Ruby (version specified in chef.json above)
-    # chef.add_recipe "ruby_build"
-    # chef.add_recipe "rbenv::system"
-
     # For Java
-    # chef.add_recipe "java"
+    chef.add_recipe "java"
+
+    # For installing Ruby (version specified in chef.json above)
+    chef.add_recipe "ruby_build"
+    chef.add_recipe "rbenv::system"
     
     # For Postgres
-    chef.add_recipe "vagrantfun::add_repos"
-    chef.add_recipe "postgresql::server"
-    chef.add_recipe "postgresql::ruby"
+    # chef.add_recipe "vagrantfun::add_repos"
+    # chef.add_recipe "postgresql::server"
+    # chef.add_recipe "postgresql::ruby"
 
     # For MySQL
-    # chef.add_recipe "mysql::server"
-    # chef.add_recipe "mysql::ruby"
+    chef.add_recipe "mysql::server"
+    chef.add_recipe "mysql::ruby"
 
     # For automatiaclly creating databases/users as specified in the 'dbs' hashes in the chef.json above
     chef.add_recipe "vagrantfun::create_databases"
@@ -188,7 +187,7 @@ Vagrant::Config.run do |config|
     ### Application Startup scripts
     ###
 
-    # chef.add_recipe "vagrantfun::rails"
- 
   end
+  # for some shell provisioning. It's the simplest way I've found for appilcation setup
+  config.vm.provision :shell, :path => "sample.sh"
 end
