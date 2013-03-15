@@ -1,5 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+# Written with Vagrant 1.1 in mind
 
 Vagrant.configure("2") do |config|
   # All Vagrant configuration is done here. The most common configuration
@@ -12,35 +13,13 @@ Vagrant.configure("2") do |config|
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
   # Make sure the box has nfs-common installed.
-  config.vm.box_url = "
+  config.vm.box_url = ""
 
-  # Boot with a GUI so you can see the screen. (Default is headless)
-  # config.vm.boot_mode = :gui
-
-  # Assign this VM to a host-only network IP, allowing you to access it
-  # via the IP. Host-only networks can talk to the host machine as well as
-  # any other machines on the same network, but cannot be accessed (through this
-  # network interface) by any external networks.
+  # Private (hostonly) network
   config.vm.network :private_network, ip: "192.168.33.10"
 
-  # Assign this VM to a bridged network, allowing you to connect directly to a
-  # network using the host's network device. This makes the VM appear as another
-  # physical device on your network.
-  # config.vm.network :bridged
-
-  ###
-  ### Port forwarding (APIs may need different ports)
-  ###
-
-  #Standard Rails port
+  # Bridged network
   # config.vm.forward_port 3000, 3000
-
-  # Share an additional folder to the guest VM. The first argument is
-  # an identifier, the second is the path on the guest to mount the
-  # folder, and the third is the path on the host to the actual folder.
-  # Note that the folder you run 'vagrant up' in is automatically
-  # set to /vagrant in the VM.
-  # config.vm.share_folder "v-data", "/vagrant_data", "../data"
 
   config.vm.synced_folder(".", "/vagrant", :nfs => true)
 
@@ -48,17 +27,15 @@ Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", 2048]
   end
-  # config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "off"] 
-
 
   #
-  # Chef Provisioning
+  #/// Chef Provisioning
   #
 
   config.vm.provision :chef_solo do |prechef|
     # If using a recipe_url for the cookbooks, include it here too
     # prechef.recipe_url = 
-    prechef.add_recipe "vagrantfun::update_chef"
+    prechef.add_recipe "vagrantfun::update_chef" #for Chef 11
 
     # Can also update with the omnibus_updater cookbook, but that adds
     # about 20-30 seconds to the process and has trouble
@@ -74,15 +51,8 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision :chef_solo do |chef|
-    # chef.roles_path = "./roles"
-    # chef.data_bags_path = "./data_bags"
-    # chef.add_recipe "users::sysadmins"
-    # chef.add_recipe "vim"
-
-    # Choose one of the following:
+    # Specify TAR ball uri if you are using one:
     # chef.recipe_url = 
-
-
 
     chef.json = { 
 
